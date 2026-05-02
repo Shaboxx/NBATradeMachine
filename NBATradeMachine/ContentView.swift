@@ -1,21 +1,26 @@
-//
-//  ContentView.swift
-//  NBATradeMachine
-//
-//  Created by Shawn Vazin on 5/1/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var teamsVM = TeamsViewModel()
+    @StateObject private var rulesVM = LeagueRulesViewModel()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            TeamsListView()
+                .tabItem { Label("Teams", systemImage: "shield.lefthalf.filled") }
+
+            PlayersListView()
+                .tabItem { Label("Players", systemImage: "person.2.fill") }
+
+            TradeMachineView()
+                .tabItem { Label("Trade", systemImage: "arrow.left.arrow.right.circle.fill") }
         }
-        .padding()
+        .environmentObject(teamsVM)
+        .environmentObject(rulesVM)
+        .task {
+            await rulesVM.load()
+            await teamsVM.load()
+        }
     }
 }
 
